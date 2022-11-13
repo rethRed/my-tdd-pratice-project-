@@ -33,4 +33,11 @@ describe("EmailValidator", () => {
         const isValid = sut.isValid("valid_email@gmail.com")
         expect(isValid).toBe(true)
     })
+
+    it("should call validator with correct email ", () => {
+        const { sut } = makeSut()
+        const isEmailSpy = vitest.spyOn(validator, "isEmail")
+        sut.isValid("valid_any@gmail.com")
+        expect(isEmailSpy).toHaveBeenCalledWith("valid_any@gmail.com")
+    })
 })
