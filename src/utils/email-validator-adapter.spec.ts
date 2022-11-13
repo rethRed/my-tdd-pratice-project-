@@ -1,5 +1,5 @@
 import { describe, vitest, it, expect } from "vitest";
-import { EmailValidatorAdapter } from "./email-validator"
+import { EmailValidatorAdapter } from "./email-validator-adapter"
 import validator from "validator"
 
 type sutTypes = {
@@ -37,7 +37,8 @@ describe("EmailValidator", () => {
     it("should call validator with correct email ", () => {
         const { sut } = makeSut()
         const isEmailSpy = vitest.spyOn(validator, "isEmail")
-        sut.isValid("valid_any@gmail.com")
-        expect(isEmailSpy).toHaveBeenCalledWith("valid_any@gmail.com")
+        sut.isValid("any_email@gmail.com")
+        expect(isEmailSpy).toHaveBeenCalledWith("any_email@gmail.com")
     })
+    
 })
