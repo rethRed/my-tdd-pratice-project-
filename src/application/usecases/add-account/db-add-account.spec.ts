@@ -1,28 +1,51 @@
 import { describe, vitest, it, expect } from "vitest";
 import { DbAddAccount } from "./db-add-account"
-import { Encrypter } from "./db-add-account-protocols"
+import { AccountModel, AddAccount, Encrypter, AddAccountRepository } from "./db-add-account-protocols"
+
 
 
 const makeEncrypter = (): Encrypter => {
     class EncrypterStub implements Encrypter {
         async encrypt(value: string): Promise<string> {
-            return value
+            return "hashed_password"
         }
     }
     return new EncrypterStub()
 }
 
+const makeAddAccountRepository = (): AddAccountRepository => {
+
+    class addAccountRepositoryStub implements AddAccountRepository {
+
+        async add(account: AddAccount.params): Promise<AccountModel> {
+            const fakeAccount = {
+                id: "valid_id",
+                name: "valid_name",
+                email: "valid_email",
+                password: "hashed_password"
+            }
+            return fakeAccount
+        }
+        
+    }
+    return new addAccountRepositoryStub()
+}
+
+
 type sutTypes = {
     sut: DbAddAccount
     encrypterStub: Encrypter
+    addAccountRepositoryStub: AddAccountRepository
 }
 const makeSut = (): sutTypes => {
 
+    const addAccountRepositoryStub = makeAddAccountRepository()
     const encrypterStub = makeEncrypter()
-    const sut = new DbAddAccount(encrypterStub)
+    const sut = new DbAddAccount(encrypterStub, addAccountRepositoryStub)
     return {
         sut,
-        encrypterStub
+        encrypterStub,
+        addAccountRepositoryStub
     }
 }
 
@@ -53,4 +76,18 @@ describe("DbAddAccount Usercase", () => {
         expect(promise).rejects.toThrow()
     })
     
+    it("should call AddAccountRepository with correct values ", async () => {
+        const { sut, addAccountRepositoryStub } = makeSut()
+        const addSpy = vitest.spyOn(addAccountRepositoryStub, "add")
+
+        const accountDataObj = accountDataMock()
+
+        await sut.add(accountDataObj)
+        expect(addSpy).toHaveBeenCalledWith({
+            ...accountDataObj,
+            password: "hashed_password"
+        
+        })
+    })
+
 })
