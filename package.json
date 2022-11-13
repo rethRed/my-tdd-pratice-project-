@@ -12,7 +12,8 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "vitest",
+    "test": "vitest --silent --runInBand",
+    "test:verbose": "vitest --runInBand",
     "dev": "ts-node-dev -r tsconfig-paths/register  --respawn --transpile-only"
   },
   "author": "",
