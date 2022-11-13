@@ -13,15 +13,11 @@ export class DbAddAccount implements AddAccount {
 
         const hashedPassword = await this.encrypter.encrypt(password)
 
-        await this.addAccountRepository.add({
+        const newAccount = await this.addAccountRepository.add({
             ...accountData,
             password: hashedPassword
         })
-        return {
-            id: "",
-            name: "",
-            email: "",
-            password: hashedPassword
-        }
+
+        return newAccount
     }
 }

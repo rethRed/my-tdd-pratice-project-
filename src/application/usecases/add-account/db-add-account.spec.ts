@@ -90,4 +90,28 @@ describe("DbAddAccount Usercase", () => {
         })
     })
 
+    it("should throw if AddAccountRepository throws", async () => {
+        const { sut, addAccountRepositoryStub } = makeSut()
+        vitest.spyOn(addAccountRepositoryStub, "add").mockImplementationOnce(() => {
+            throw new Error()
+        })
+
+        const promise =  sut.add(accountDataMock())
+        expect(promise).rejects.toThrow()
+    })
+
+    it("should return an account on success", async () => {
+        const { sut, addAccountRepositoryStub } = makeSut()
+
+        const accountDataObj = accountDataMock()
+
+        const account = await sut.add(accountDataObj)
+        expect(account).toEqual({
+            id: "valid_id",
+            ...accountDataObj,
+            password: "hashed_password"
+        })
+    })
+    
+
 })
