@@ -2,7 +2,7 @@ import { describe, expect, it, test, vitest } from "vitest";
 
 import { SignUpController } from "./signup"
 import { MissingParamError, InvalidParamError, ServerError } from "@/presentation/erros"
-import { EmailValidator } from "@/presentation/protocols/email-validator"
+import { EmailValidator } from "@/presentation/protocols"
 
 type SutTypes = {
     sut: SignUpController
