@@ -19,7 +19,12 @@ const makeSut = (): sutTypes => {
     }
 }
 
+
 describe("Bcrypt Adapter", () => {
+
+    vitest.spyOn(bcrypt, "hash").mockImplementation(() => {
+        return "hash"
+    })
 
     it("Should call bcrypt with correct value", async () => {
         const { sut, salt } = makeSut()
@@ -29,4 +34,14 @@ describe("Bcrypt Adapter", () => {
 
         expect(hashSpy).toHaveBeenCalledWith("any_value", salt)
     })
+
+    it("Should return a hash on success", async () => {
+        const { sut } = makeSut()
+
+        const hash = await sut.encrypt("any_value")
+
+        expect(hash).toBe("hash")
+    })
+
+    
 })
