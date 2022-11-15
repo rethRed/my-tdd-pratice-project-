@@ -6,7 +6,13 @@ import { LogControllerDecorator } from "./log";
 const makeController = (): Controller => { 
     class ControllerStub implements Controller {
         async handle(httpRequest: HttpRequest): Promise<HttpResponse> {
-            return ok({ok: true})
+
+            const httpResponse: HttpResponse = {
+                statusCode: 200,
+                body: {}
+            }
+
+            return httpResponse
         }
     }
     return new ControllerStub()
@@ -25,7 +31,7 @@ const makeSut = (): sutTypes => {
             name: "any_name",
             password: "any_password",
             passwordConfirmation: "any_password"
-        }
+        } 
     }
     const controllerStub = makeController() 
     const sut = new LogControllerDecorator(controllerStub)
@@ -47,5 +53,15 @@ describe("DbAddAccount Usercase", () => {
 
         await sut.handle(httpRequest)
         expect(handleSpy).toHaveBeenCalledWith(httpRequest)
+    })
+
+    it("Should return the same result of the controller", async () => {
+        const { sut, httpRequest, controllerStub } = makeSut()
+
+        const response = await sut.handle(httpRequest)
+        expect(response).toEqual({
+            statusCode: 200,
+            body: {}
+        })
     })
 })
