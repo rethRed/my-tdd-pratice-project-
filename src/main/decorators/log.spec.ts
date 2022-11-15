@@ -56,7 +56,7 @@ describe("DbAddAccount Usercase", () => {
     })
 
     it("Should return the same result of the controller", async () => {
-        const { sut, httpRequest, controllerStub } = makeSut()
+        const { sut, httpRequest } = makeSut()
 
         const response = await sut.handle(httpRequest)
         expect(response).toEqual({
