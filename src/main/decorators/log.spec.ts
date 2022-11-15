@@ -1,4 +1,5 @@
-import { ok } from "@/presentation/helpers";
+import { LogErrorRepository } from "@/application/protocols/log-error-repository";
+import {  serverError } from "@/presentation/helpers";
 import { Controller, HttpRequest, HttpResponse } from "@/presentation/protocols";
 import { describe, vitest, it, expect } from "vitest";
 import { LogControllerDecorator } from "./log";
@@ -18,10 +19,20 @@ const makeController = (): Controller => {
     return new ControllerStub()
 }
 
+const makeLogErrorRepository  = (): LogErrorRepository => { 
+    class LogErrorRepositoryStub implements LogErrorRepository {
+        async log(stack: string): Promise<void> {
+            
+        }
+    }
+    return new LogErrorRepositoryStub()
+}
+
 type sutTypes = {
     sut: Controller
     httpRequest: HttpRequest,
-    controllerStub: Controller
+    controllerStub: Controller,
+    logErrorRepositoryStub: LogErrorRepository
 }
 const makeSut = (): sutTypes => {
 
@@ -34,11 +45,13 @@ const makeSut = (): sutTypes => {
         } 
     }
     const controllerStub = makeController() 
-    const sut = new LogControllerDecorator(controllerStub)
+    const logErrorRepositoryStub = makeLogErrorRepository()
+    const sut = new LogControllerDecorator(controllerStub, logErrorRepositoryStub)
     return {
         sut,
         httpRequest,
-        controllerStub
+        controllerStub,
+        logErrorRepositoryStub
     }
 }
 
@@ -63,5 +76,21 @@ describe("DbAddAccount Usercase", () => {
             statusCode: 200,
             body: {}
         })
+    })
+
+    it("Should call LogErrorRepository with correct error if controller returns a server error", async () => {
+        const { sut, httpRequest,controllerStub, logErrorRepositoryStub} = makeSut()
+
+        const fakeError = new Error()
+        fakeError.stack = "any_stack"
+        const error = serverError(fakeError)
+        const logSpy = vitest.spyOn(logErrorRepositoryStub, "log")
+
+        vitest.spyOn(controllerStub, "handle")
+        .mockReturnValueOnce(new Promise(resolve => resolve(error)))
+
+        await sut.handle(httpRequest)
+        
+        expect(logSpy).toBeCalledWith("any_stack")
     })
 })
