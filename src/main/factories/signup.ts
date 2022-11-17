@@ -14,5 +14,5 @@ export const makeSignUpController = () : Controller => {
     const accountInMemoryRepository = inMemoryHelper.accountRepository
     const dbAddAccount = new DbAddAccount(bcryptAdapter, accountInMemoryRepository)
     const signUpController = new SignUpController(emailValidator, dbAddAccount)
-    return new LogControllerDecorator(signUpController)
+    return new LogControllerDecorator(signUpController )
 }
